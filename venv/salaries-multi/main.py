@@ -1,7 +1,9 @@
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
 
 df = pd.read_csv('../data/salaries-2023.csv')
 df = df.dropna()  # drop null values
@@ -26,7 +28,7 @@ df = df[df['city'].isin(allowed_cities)]
 df_sorted = df.sort_values(by='salary', ascending=False)
 # print(df_sorted.head(20))
 
-df = df[df['salary'] <= 6000 ]
+df = df[df['salary'] <= 6000]
 # print(df.shape)
 #
 # x = df.iloc[:, -2:-1]
@@ -49,8 +51,21 @@ sns.heatmap(df.corr(), annot=True)
 plt.show()
 
 x = df.iloc[:, 0:2].values  # we take only years and level as x values
-y = df.iloc[:, 2].values    # we take the salary
+y = df.iloc[:, 2].values  # we take the salary
 # print(x[0:5])
 # print(y[0:5])
 
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=0)
+# print(x_train.shape)
+
+model = LinearRegression()
+model.fit(x_train, y_train)
+
+y_pred = model.predict(x_test)
+# print(y_pred)
+salaries = model.predict([[3, 15], [3, 10]])
+# print(salaries)
+
+r2 = r2_score(y_test, y_pred)
+print(f'R2 Score: {r2} ({r2:.2%})')
 
